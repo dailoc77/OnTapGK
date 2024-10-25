@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState , useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -14,13 +14,20 @@ export default function LoginScreen() {
   const [loginError, setLoginError] = useState(''); 
 
   // Mảng chứa thông tin đăng nhập
-  const users = [
-    { email: 'maiqtruong2403@gmail.com', password: 'truong2403' },
-    { email: 'user2@example.com', password: 'password2' },
-    { email: 'user3@example.com', password: 'password3' },
-    { email: 'user4@example.com', password: 'password4' },
-    { email: 'user5@example.com', password: 'password5' },
-  ];
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('https://671bbb4c2c842d92c3811854.mockapi.io/api/dailoc/users');
+        const data = await response.json();
+        setUsers(data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+    fetchData();
+  }, []);
 
   const handleLogin = () => {
     // Kiểm tra thông tin đăng nhập

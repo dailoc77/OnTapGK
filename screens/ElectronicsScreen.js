@@ -24,8 +24,8 @@ export default function ElectronicsScreen() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const categoriesResponse = await axios.get('https://671168cf4eca2acdb5f4c2fe.mockapi.io/categoriesOfElectronic');
-        const productsResponse = await axios.get('https://671168cf4eca2acdb5f4c2fe.mockapi.io/productsOfElectronics');
+        const categoriesResponse = await axios.get('https://63abd135fdc006ba60665046.mockapi.io/api/dailoc/categoriesOfElectronic');
+        const productsResponse = await axios.get('https://63abd135fdc006ba60665046.mockapi.io/api/dailoc/productsOfElectronics');
         setCategories(categoriesResponse.data);
         setProducts(productsResponse.data);
         setFilteredProducts(productsResponse.data);
