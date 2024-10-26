@@ -6,6 +6,7 @@ import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import Dots from 'react-native-dots-pagination'; 
 import { useNavigation } from '@react-navigation/native';
 import { CartContext } from '../contexts/CartContext';
+import { getFirestore, collection, getDocs } from 'firebase/firestore';
 
 export default function ElectronicsScreen() {
   const [categories, setCategories] = useState([]);
@@ -20,15 +21,20 @@ export default function ElectronicsScreen() {
   const [searchText, setSearchText] = useState('');
 
   const { addToCart } = useContext(CartContext); // Use CartContext
+  const db = getFirestore();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const categoriesResponse = await axios.get('https://63abd135fdc006ba60665046.mockapi.io/api/dailoc/categoriesOfElectronic');
-        const productsResponse = await axios.get('https://63abd135fdc006ba60665046.mockapi.io/api/dailoc/productsOfElectronics');
-        setCategories(categoriesResponse.data);
-        setProducts(productsResponse.data);
-        setFilteredProducts(productsResponse.data);
+        const categoriesSnapshot = await getDocs(collection(db, 'category'));
+        const productsSnapshot = await getDocs(collection(db, 'product'));
+
+        const categoriesData = categoriesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const productsData = productsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        setCategories(categoriesData);
+        setProducts(productsData);
+        setFilteredProducts(productsData);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -39,10 +45,11 @@ export default function ElectronicsScreen() {
   const filterProducts = (categoryId, categoryName) => {
     setSelectedCategoryId(categoryId);
     const filtered = products.filter(product =>
-      product.name === categoryName && product.status === selectedTab
+      product.categoryId === categoryId && product.status === selectedTab
     );
     setFilteredProducts(filtered);
   };
+  // Removed duplicate useEffect and filterProducts function
 
   useEffect(() => {
     if (selectedCategoryId) {

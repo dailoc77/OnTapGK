@@ -2,6 +2,9 @@ import React, { useState , useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { getFirestore, collection, getDocs } from 'firebase/firestore';
+import { initializeApp } from 'firebase/app';
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 
 export default function LoginScreen() {
   const navigation = useNavigation();
@@ -16,18 +19,20 @@ export default function LoginScreen() {
   // Mảng chứa thông tin đăng nhập
   const [users, setUsers] = useState([]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch('https://671bbb4c2c842d92c3811854.mockapi.io/api/dailoc/users');
-        const data = await response.json();
-        setUsers(data);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-    fetchData();
-  }, []);
+  const firebaseConfig = {
+    apiKey: "AIzaSyBt9DTbdvVG0jZwgmNVECl3ens6P_R6Gmc",
+    authDomain: "gkapp-194b8.firebaseapp.com",
+    projectId: "gkapp-194b8",
+    storageBucket: "gkapp-194b8.appspot.com",
+    messagingSenderId: "603481518827",
+    appId: "1:603481518827:web:dd1ce49ad7b741727304ae",
+    measurementId: "G-JPNS52GLCV"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const auth = getAuth(app);
 
   const handleLogin = () => {
     // Kiểm tra thông tin đăng nhập
@@ -37,15 +42,18 @@ export default function LoginScreen() {
       return;
     }
 
-    const user = users.find(user => user.email === email && user.password === password);
-    if (user) {
-      // Đăng nhập thành công
-      navigation.navigate('Electronics');
-    } else {
-      setLoginError('Email hoặc mật khẩu không đúng!'); // Thiết lập thông báo lỗi
-      setModalVisible(true); // Hiển thị modal thông báo lỗi
-    }
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        // Đăng nhập thành công
+        navigation.navigate('Electronics');
+      })
+      .catch((error) => {
+        setLoginError('Email hoặc mật khẩu không đúng!'); // Thiết lập thông báo lỗi
+        setModalVisible(true); // Hiển thị modal thông báo lỗi
+      });
   };
+
+  // Remove the redundant handleLogin function
 
   const toggleShowPassword = () => {
     setPasswordVisible(!isPasswordVisible);
